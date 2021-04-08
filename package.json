@@ -1,0 +1,28 @@
+{
+  "name": "humblestumble",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "cookie-parser": "^1.4.5",
+    "ejs": "^3.1.5",
+    "express": "^4.17.1",
+    "express-flash-notification": "^0.5.0",
+    "express-sanitizer": "^1.0.5",
+    "express-session": "^1.17.1",
+    "express-validator": "^6.8.0",
+    "mapbox-gl": "^1.13.0",
+    "mongodb": "^3.6.3",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "webpack": "^5.10.0",
+    "webpack-cli": "^4.2.0"
+  }
+}

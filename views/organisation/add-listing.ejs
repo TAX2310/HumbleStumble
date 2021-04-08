@@ -1,0 +1,17 @@
+<html>
+        <head>
+                <title>update recipe</title>
+        </head>
+        <body>
+        <h1> Add Listing </h1>
+                <form method="POST" action="/organisation/add-listing_post">
+                        <% recipe.forEach(function(recipe){ %>
+                        Title: <br> <input id="title" type="text" name="title" value="<%= listing.title %>"><br>
+                        Location: <br> <input id="location" type="text" name="location" value="<%= listing.location %>" ><br>
+                        Discription: <br> <textarea name="discription"> <%= listing.discription %></textarea> <br>
+                        <input type="submit" value="submit" />
+                        <% }) %>
+                </form>
+                <a href='./'>Home</a>
+        </body>
+</html>

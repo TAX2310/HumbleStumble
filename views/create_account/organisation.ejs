@@ -1,0 +1,18 @@
+<html>
+  	<head>
+    	<title>Organisation</title>
+  	</head>
+	<body>
+	<%if (error.length > 0) { %>
+	<%- error %>
+	<% } %>
+  	<h1> Creat Organisation account </h1>
+		<form method="POST" action="/create_account/organisation_post">
+  			Username: <input id="usrName" type="text" name="usrName" /><br>
+  			Password: <input id="password" type="text" name="password" /><br>
+			Email: <input id="email" type="text" name="email" /><br>
+  			<input type="submit" value="OK" />
+		</form>
+		<a href='/'>Home</a>
+  	</body>
+</html>
