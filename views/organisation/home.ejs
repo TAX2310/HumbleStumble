@@ -19,14 +19,18 @@
     
     <div id="map"></div>
     <script type="text/javascript">
-        mapboxgl.accessToken = 
+      mapboxgl.accessToken = 
         'pk.eyJ1IjoidGF5bG9yMjMxMCIsImEiOiJja2lnOHVtaHQwY3dmMnhtcW1yMHpoOWp5In0.s9Bj_7caOCem8NE1Yh7baw';
+      navigator.geolocation.getCurrentPosition(position => {
+        const { latitude, longitude } = position.coords;
         var map = new mapboxgl.Map({
           container: 'map',
           style: 'mapbox://styles/mapbox/streets-v11', // style URL
-          center: [-74.5, 40], // starting position [lng, lat]
-          zoom: 9 // starting zoom
-        });</script>
+          center: [longitude,latitude], // starting position [lng, lat]
+          zoom: 14 // starting zoom
+        });
+      });
+    </script>
 
    
   </body>
