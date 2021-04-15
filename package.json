@@ -20,6 +20,7 @@
     "express-validator": "^6.8.0",
     "mapbox-gl": "^1.13.0",
     "mongodb": "^3.6.3",
+    "node-geocoder": "^3.27.0",
     "path": "^0.12.7"
   },
   "devDependencies": {

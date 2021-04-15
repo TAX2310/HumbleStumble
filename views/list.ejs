@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+  <head>
+    <title>List  webpage!</title>
+  </head>
+<body>
+  <ul>
+    <% listing.forEach(function(listing){ %>
+      <li> 
+        <a href="../display_listing?title=<%= listing.title %>"><%= listing.title %></a>
+        <%= listing.organisation %> 
+        <a href="/organisation/update_listing?title=<%= listing.title %>"> Update </a> 
+        <a href="/organisation/delete?title=<%= listing.title %>"> Delete </a> 
+      </li>
+    <% }) %>
+  </ul>
+  <a href='../'>Home</a>
+</body>
+</html>

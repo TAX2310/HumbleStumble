@@ -30,15 +30,15 @@ module.exports = function(app){
         }
     }
 
-    app.get('/organisation/add-listing', redirectLogin, redirectPersonal, function(req,res){
+    app.get('/organisation/add_listing', redirectLogin, redirectPersonal, function(req,res){
 
-        res.render("organisation/add-listing.ejs", {listing: null, error: null, update: false});
+        res.render("organisation/add_listing.ejs", {listing: null, error: null, update: false});
     });
 
-    app.get('/organisation/update-listing', redirectLogin, redirectPersonal, async function(req,res){
+    app.get('/organisation/update_listing', redirectLogin, redirectPersonal, async function(req,res){
 
         var result = await dbControle.findOneListing(req);
-        res.render("organisation/add-listing.ejs", {listing: result, error: null, update: true});
+        res.render("organisation/add_listing.ejs", {listing: result, error: null, update: true});
     });
 
     app.get('/organisation/delete', redirectLogin, redirectPersonal, async function(req, res) {
@@ -81,8 +81,25 @@ module.exports = function(app){
     app.get('/organisation/list', redirectLogin, redirectPersonal, async function(req, res) {
 
         var results = await dbControle.findUserListings(req);
-        res.render('organisation/list.ejs', {listing: results});
+        res.render('list.ejs', {listing: results});
     });
+
+    app.get('/display_listing', redirectLogin, async function(req, res) {
+
+        var result = await dbControle.findOneListing(req);
+        res.render('display_listing.ejs', {listing: result});
+    });
+
+    app.get('/search_listing', redirectLogin, function(req,res){
+        res.render("search.ejs");
+    });
+
+    app.post('/search_listing', async function (req, res) {
+
+        result = await dbControle.searchListing(req);
+        res.render('list.ejs', {listing: result});
+
+  });
 
 };
 

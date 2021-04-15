@@ -3,6 +3,12 @@ const bcrypt = require('bcrypt');
     const path = require('path');
 const MongoClient = require('mongodb').MongoClient;
     const url = "mongodb+srv://TAX2310:cotch2310@cluster0.lsvo0.mongodb.net/HS?retryWrites=true&w=majority";
+const NodeGeocoder = require('node-geocoder');
+  	const options = {
+    	provider: 'opencage',
+    	apiKey: '8d212f8fdd7849e8b2ffb1c8447d9078', 
+  	};
+  	const geocoder = NodeGeocoder(options);
 
 async function checkExistingAcc(req) {
 	return new Promise((resolve, reject) => {
@@ -63,11 +69,13 @@ async function checkExistingListing(req) {
 function createListing (req) {
 	MongoClient.connect(url, async function(err, client) {
         if (err) throw err;
+        var coords = await geocoder.geocode(req.body.location)
         var db = client.db ('HS');
 	    db.collection('listing').insertOne({
 			user: req.sanitize(req.session.userId),
 	    	title: req.sanitize(req.body.title),
 	    	location: req.sanitize(req.body.location),
+	    	coords: coords[0],
 			description: req.sanitize(req.body.description)
 		});
         client.close();
@@ -151,6 +159,21 @@ async function findUserListings (req) {
 	});
 }
 
+async function findAllListings () {
+	return new Promise((resolve, reject) => {
+		MongoClient.connect(url, function (err, client) {
+            if (err) throw err;
+            var db = client.db('HS');
+            db.collection('listing').find().toArray((err, results) => {
+                if (err) throw err;
+                client.close();
+                resolve(results);
+            });
+            client.close();
+        });
+	});
+}
+
 async function deleteListing (req) {
 	return new Promise((resolve, reject) => {
 		MongoClient.connect(url, function (err, client) {
@@ -163,6 +186,26 @@ async function deleteListing (req) {
 	});
 }
 
+async function searchListing (req) {
+	return new Promise((resolve, reject) => {
+		MongoClient.connect(url, async function (err, client) {
+            if (err) throw err;
+            var db = client.db('HS');
+            await db.createIndex("listing", { title: "text"})
+            await db.collection('listing').find({
+        		"$text": {"$search": req.body.keyword}}, 
+        		{ title: 1, textScore: {$meta: "textScore"}}, 
+				{ sort: {textScore: {$meta: "textScore"}}
+      		}).toArray(function(err, items) {
+      			console.log(items);
+	        	client.close();
+	        	resolve(items);
+      		})
+        });
+	});
+}
+
+
 module.exports.checkExistingAcc = checkExistingAcc;
 module.exports.checkExistingListing = checkExistingListing;
 module.exports.createAcc = createAcc;
@@ -172,6 +215,9 @@ module.exports.checkExistingAccType = checkExistingAccType;
 module.exports.login = login;
 module.exports.findOneListing = findOneListing;
 module.exports.findUserListings = findUserListings;
+module.exports.findAllListings = findAllListings;
+module.exports.searchListing = searchListing;
 module.exports.deleteListing = deleteListing;
+
 
 
