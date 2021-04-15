@@ -36,7 +36,7 @@
           center: [longitude,latitude], // starting position [lng, lat]
           zoom: 14 // starting zoom
         });
-        map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+        map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
         map.addControl(
           new mapboxgl.GeolocateControl({
             positionOptions: {
