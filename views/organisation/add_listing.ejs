@@ -1,29 +1,49 @@
 <html>
         <head>
-                <title>update recipe</title>
+            <title>Add listing</title>
+            <link rel="stylesheet" href="/styles/organisation.css">
+            <link rel="stylesheet" href="/styles/swup.css">
+            <script src="https://unpkg.com/swup@latest/dist/swup.min.js"></script>  
+            <script defer src="/script.js"></script>
+            <% if (error != null) { %>    
+                <script type="text/javascript">
+                    window.alert(<%-JSON.stringify(error.errors[0].msg)%> + ' at ' + <%-JSON.stringify(error.errors[0].param)%>)
+                </script>
+            <% } %>
         </head>
         <body>
-        <h1> Add Listing </h1>
-                <% if (error != null) { %>
-                        
-                        <script type="text/javascript">
-                                window.alert(<%-JSON.stringify(error.errors[0].msg)%> + ' at ' + <%-JSON.stringify(error.errors[0].param)%>)
-                        </script>
-                <% } %>
-                <% if (update) { %>
-                        <form method="POST" action="/organisation/listing_update_post?title=<%= listing.title %>">
-                                Title: <br> <input id="title" type="text" name="title" value="<%= listing.title %>"> <br>
-                                Location: <br> <input id="location" type="text" name="location" value="<%= listing.location %>"> <br>
-                                Description: <br> <textarea id="description" name="description"><%= listing.description %></textarea> <br>
-                                <input type="submit" value="submit" />
-                <% } else { %>
-                        <form method="POST" action="/organisation/listing_post">
-                                Title: <br> <input id="title" type="text" name="title" > <br>
-                                Location: <br> <input id="location" type="text" name="location"> <br>
-                                Description: <br> <textarea id="description" name="description"></textarea> <br>
-                                <input type="submit" value="submit" />
-                        </form>
-                <% } %>
-                <a href='../'>Home</a>
+        <header>
+            <h1><a id=title href='../'>HumbleStumble</a></h1>
+            <div id="menu">
+            <a href='/logout'>Logout</a>
+            <a href='/organisation/add_listing'>Add Listing</a>
+            <a href='/organisation/list'>Your Listings</a>
+            </div>
+        </header>
+        <main id="swup" class="transition-fade">
+        <h2> Add Listing </h2>
+            <% if (update) { %>
+                <form method="POST" action="/organisation/listing_update_post">
+                    Title: <br> <input id="title" type="text" name="title" value="<%= listing.title %>"> <br>
+                    Location: <br> <input id="location" type="text" name="location" value="<%= listing.location %>"> <br>
+                    Description: <br> <textarea id="description" name="description"><%= listing.description %></textarea> <br>
+                    <br>Start date:<br>
+                    <input type="date" id="expire" name="expire"
+                            value="<%= listing.expire %>"
+                            min="2021-01-01" max="2100-12-31"> </br>
+                    <input type="submit" value="Submit" />
+                </form>
+            <% } else { %>
+                <form method="POST" action="/organisation/listing_post">
+                    Title: <br> <input id="title" type="text" name="title" > <br>
+                    Location: <br> <input id="location" type="text" name="location"> <br>
+                    Description: <br> <textarea id="description" name="description"></textarea> <br>
+                    <br>Start date:<br>
+                    <input type="date" id="expire" name="expire"
+                           min="2021-01-01" max="2100-12-31"> </br>
+                    <input class="button" type="submit" value="Submit" />
+                </form> 
+            <% } %>
+        </main>
         </body>
 </html>

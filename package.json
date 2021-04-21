@@ -21,7 +21,9 @@
     "mapbox-gl": "^1.13.0",
     "mongodb": "^3.6.3",
     "node-geocoder": "^3.27.0",
-    "path": "^0.12.7"
+    "node-schedule": "^2.0.0",
+    "path": "^0.12.7",
+    "swup": "^2.0.14"
   },
   "devDependencies": {
     "webpack": "^5.10.0",

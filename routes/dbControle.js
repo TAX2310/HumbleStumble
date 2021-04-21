@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 	const saltRounds = 10;
     const path = require('path');
 const MongoClient = require('mongodb').MongoClient;
+    const ObjectId = require('mongodb').ObjectId; 
     const url = "mongodb+srv://TAX2310:cotch2310@cluster0.lsvo0.mongodb.net/HS?retryWrites=true&w=majority";
 const NodeGeocoder = require('node-geocoder');
   	const options = {
@@ -9,6 +10,62 @@ const NodeGeocoder = require('node-geocoder');
     	apiKey: '8d212f8fdd7849e8b2ffb1c8447d9078', 
   	};
   	const geocoder = NodeGeocoder(options);
+const schedule = require('node-schedule');
+
+
+const checkExpired = schedule.scheduleJob('* 12 * * *', function(){
+  
+  moveExpiredListing();
+});
+
+const calculateRank = schedule.scheduleJob('13 * * * * *', async function(){
+  
+	var allAcc = await findAllAcc();
+  	for (var i = 0; i < allAcc.length; i++) {
+  		var listings = await findApplyedListings(allAcc[i]);
+  		var diffs = [];
+  		for (var j = 1; j < listings.length; j++) {
+  			var diff = (listings[j-1].expire - listings[j].expire);
+  			diffs.push(diff);
+  		};
+  		var total = diffs.reduce((a, b) => a + b, 0)
+  		var avg = total/listings.length;
+  		console.log(total)
+  		console.log(avg)
+  		 
+  	};
+});
+
+async function findAllAcc () {
+	return new Promise((resolve, reject) => {
+		MongoClient.connect(url, function (err, client) {
+            if (err) throw err;
+            var db = client.db('HS');
+            db.collection('personal').find().toArray((err, results) => {
+                if (err) throw err;
+                client.close();
+                resolve(results);
+            });
+            client.close();
+        });
+	});
+}
+
+async function findApplyedListings (acc) {
+	return new Promise((resolve, reject) => {
+		MongoClient.connect(url, function (err, client) {
+            if (err) throw err;
+            var db = client.db('HS');
+            db.collection('expired_listing').find({volunteer: acc.usrName}).sort({expire: -1}).toArray((err, results) => {
+                if (err) throw err;
+                client.close();
+                // console.log(results);
+                resolve(results);
+            });
+            client.close();
+        });
+	});
+}
 
 async function checkExistingAcc(req) {
 	return new Promise((resolve, reject) => {
@@ -23,7 +80,7 @@ async function checkExistingAcc(req) {
 				resolve(true);
 	        };
 	        client.close();
-	        reject(false);
+	        resolve(false);
 	    });
 	});
 };
@@ -76,7 +133,10 @@ function createListing (req) {
 	    	title: req.sanitize(req.body.title),
 	    	location: req.sanitize(req.body.location),
 	    	coords: coords[0],
-			description: req.sanitize(req.body.description)
+			description: req.sanitize(req.body.description),
+			expire: new Date(req.body.expire),
+			status: 'available',
+			volunteer: null
 		});
         client.close();
     });
@@ -87,7 +147,7 @@ function updateListing (req) {
         if (err) throw err;
         console.log('1')
         var db = client.db ('HS');
-	    db.collection('listing').updateOne({title: req.query.title},{ $set: {
+	    db.collection('listing').updateOne({_id: new ObjectId(req.query.id)},{ $set: {
 	    	title: req.sanitize(req.body.title),
 	    	location: req.sanitize(req.body.location),
 			description: req.sanitize(req.body.description)
@@ -96,21 +156,35 @@ function updateListing (req) {
     });
 };
 
-function createAcc (req,type) {
+function acceptListing (req) {
 	MongoClient.connect(url, async function(err, client) {
         if (err) throw err;
+        console.log('1')
         var db = client.db ('HS');
-        var plainPassword = req.sanitize(req.body.password);
-        var hashedPassword = await bcrypt.hash(plainPassword, saltRounds)
-        db.collection(type).insertOne({
-			usrName: req.sanitize(req.body.usrName),
-			password: hashedPassword,
-			email: req.sanitize(req.body.email),
-			accType: type
-        });
-        req.session.userId = req.body.usrName;
-        req.session.accType = type;
+	    db.collection('listing').updateOne({_id: new ObjectId(req.query.id)},{ $set: {
+	    	status: 'unavailable',
+			volunteer: req.session.userId
+		}});
         client.close();
+    });
+};
+
+async function createAcc (req,type) {
+	return new Promise((resolve, reject) => {
+		MongoClient.connect(url, async function(err, client) {
+	        if (err) throw err;
+	        var db = client.db ('HS');
+	        var plainPassword = req.sanitize(req.body.password);
+	        var hashedPassword = await bcrypt.hash(plainPassword, saltRounds)
+	        db.collection(type).insertOne({
+				usrName: req.sanitize(req.body.usrName),
+				password: hashedPassword,
+				email: req.sanitize(req.body.email),
+				accType: type
+	        });
+	        client.close();
+	    });
+	    resolve();
     });
 };
 
@@ -136,7 +210,7 @@ async function findOneListing (req) {
 		MongoClient.connect(url, async function(err, client) {
             if (err) throw err;
             var db = client.db ('HS');
-            await db.collection('listing').findOne({title: req.query.title}, function(err, result) {
+            await db.collection('listing').findOne({_id: new ObjectId(req.query.id)}, function(err, result) {
             	resolve(result)
             });
             client.close();
@@ -174,12 +248,27 @@ async function findAllListings () {
 	});
 }
 
+async function findAllAvailableListings () {
+	return new Promise((resolve, reject) => {
+		MongoClient.connect(url, function (err, client) {
+            if (err) throw err;
+            var db = client.db('HS');
+            db.collection('listing').find({status: 'available'}).toArray((err, results) => {
+                if (err) throw err;
+                client.close();
+                resolve(results);
+            });
+            client.close();
+        });
+	});
+}
+
 async function deleteListing (req) {
 	return new Promise((resolve, reject) => {
 		MongoClient.connect(url, function (err, client) {
             if (err) throw err;
             var db = client.db('HS');
-            db.collection('listing').remove({title: req.query.title});
+            db.collection('listing').remove({_id: new ObjectId(req.query.id)});
             client.close();
             resolve();
         });
@@ -205,12 +294,31 @@ async function searchListing (req) {
 	});
 }
 
+async function moveExpiredListing() {
+	MongoClient.connect(url, async function (err, client) {
+        if (err) throw err;
+        var db = client.db('HS');
+        var result = await findAllListings();
+        let ts = Date.now();
+        var date = new Date(ts);
+        // .toLocaleDateString()
+        for (var i = 0; i < result.length; i++) {
+        	if(date > result[i].expire){
+        		db.collection('listing').remove({_id: new ObjectId(result[i]._id)});
+        		db.collection('expired_listing').insertOne(result[i]);
+        		console.log("ok")
+        	}
+        }
+
+    });
+}
 
 module.exports.checkExistingAcc = checkExistingAcc;
 module.exports.checkExistingListing = checkExistingListing;
 module.exports.createAcc = createAcc;
 module.exports.createListing = createListing;
 module.exports.updateListing = updateListing;
+module.exports.acceptListing = acceptListing;
 module.exports.checkExistingAccType = checkExistingAccType;
 module.exports.login = login;
 module.exports.findOneListing = findOneListing;
@@ -218,6 +326,9 @@ module.exports.findUserListings = findUserListings;
 module.exports.findAllListings = findAllListings;
 module.exports.searchListing = searchListing;
 module.exports.deleteListing = deleteListing;
+module.exports.findAllAvailableListings = findAllAvailableListings;
+module.exports.moveExpiredListing = moveExpiredListing;
+module.exports.findApplyedListings = findApplyedListings;
 
 
 

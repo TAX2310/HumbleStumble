@@ -2,11 +2,19 @@
 <html>
   <head>
     <title>Creat account</title>
+    <link rel="stylesheet" href="/styles/personal.css">
+    <link rel="stylesheet" href="/styles/swup.css">
+    <script src="https://unpkg.com/swup@latest/dist/swup.min.js"></script>  
+    <script defer src="/script.js"></script>
   </head>
-  <h1>Are you creating an account as a?</h1>
+  
   <body>
-    <a href='/create_account/personal'>Volunteer</a>
-    <h1>or</h1>
-    <a href='/create_account/organisation'>Organisation</a>
+  	<header>
+    	<h1><a id=title href='../'>HumbleStumble</a></h1>
+    </header>
+    <main id="swup" class="transition-fade">
+      <a href='/create_account/personal'>Volunteer</a>
+     	<a href='/create_account/organisation'>Organisation</a>
+    </main>
   </body>
 </html>

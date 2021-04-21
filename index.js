@@ -34,6 +34,6 @@ require('./routes/listing.js')(app);
 app.set('views',__dirname + '/views');
 app.set('view engine', 'ejs');
 app.engine('html', require('ejs').renderFile);
-//app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "public")));
 // test
 app.listen(port, () => console.log(`app listening on port ${port}!`))

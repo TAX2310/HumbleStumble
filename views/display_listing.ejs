@@ -2,13 +2,45 @@
 <!doctype html>
 <html>
   <head>
-    <title>List  webpage!</title>
+    <title>list</title>
+    <% if(user.accType == "organisation") { %> 
+      <link rel="stylesheet" href="/styles/organisation.css">
+    <% } else {%> 
+      <link rel="stylesheet" href="/styles/personal.css">
+    <% } %> 
+    <link rel="stylesheet" href="/styles/swup.css">
+    <script src="https://unpkg.com/swup@latest/dist/swup.min.js"></script>  
+    <script defer src="/script.js"></script>
   </head>
   <body>
-    <h3><%= listing.user %></h3><br>
+    <header>
+    <h1><a id=title href='../'>HumbleStumble</a></h1>
+    <% if(user.accType == "organisation") { %> 
+      <div id="menu">
+        <a href='/logout'>Logout</a>
+        <a href='/organisation/add_listing'>Add Listing</a>
+        <a href='/organisation/list'>Your Listings</a>
+      </div>
+    <% } else {%>
+      <div id="menu">
+        <a href='/logout'>Logout</a>
+        <a href='/personal/list'>Your Listings</a>
+      </div>
+    <% } %>
+  </header>
+  <main id="swup" class="transition-fade">
     <h1><%= listing.title %></h1><br>
-    <p>location: <br><%= listing.location %></p><br>
-    <p>description: <br><%= listing.description %></p><br>
-    <a href='./'>Home</a>
+    Charity:<br>
+    <h3><%= listing.user %></h3><br>
+    <p>Location: <br><%= listing.location %></p><br>
+    <p>Description: <br><%= listing.description %></p><br>
+    <% if (user.accType == 'organisation') {%>
+      <a href="/organisation/update_listing?id=<%= listing._id %>"> Update </a> 
+      <a href="/organisation/delete?id=<%= listing._id %>"> Delete </a>
+    <% } else { %>
+      <a href="/personal/accept_listing?id=<%= listing._id %>"> Accept </a>
+    <% } %>
+    <br>
+  </main>
   </body>
 </html>

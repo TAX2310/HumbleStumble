@@ -1,0 +1,77 @@
+body { margin: 0;
+	padding: 0;
+	color: #dcf3ee; 
+	background: #3b424c; 
+	text-align: center; }
+
+header { text-align: center; 
+	height: 120px;
+	color: #dcf3ee; 
+	padding: 20px 20px 5px 20px;
+	margin-bottom: 50px; 
+	border-bottom-style: solid; 
+	border-color: #2b6974;
+	background: #3b424c;  
+	z-index: 1; }
+
+a { padding: 5px 5px 5px 5px; 
+	margin: 10px 10px 10px 10px; 
+	border-top-style:solid; 
+	border-bottom-style:solid; 
+	border-color:#2b6974; 
+	border-width: 2px; }
+
+a:link { text-decoration: none; 
+	color: #dcf3ee; }
+
+a:visited { text-decoration: none; 
+	color: #dcf3ee; }
+
+a:hover { text-decoration: none; 
+	color: #dcf3ee; }
+
+a:active { text-decoration: none; 
+	color: #dcf3ee; }
+
+#title { top: 50%; border-style: none; }
+
+#menu { padding: 10px; 
+	z-index: 1; }
+
+#map { position: absolute; 
+	top: 145px;	 
+	bottom: 0; 
+	width: 100%; 
+	z-index: -1; }
+
+#map a { border: none; }
+
+#map a:link { text-decoration: none; 
+	color: #2b6974; }
+
+#map a:visited { text-decoration: none; 
+	color: #2b6974; }
+
+#map a:hover { text-decoration: none; 
+	color: #2b6974; }
+
+#map a:active { text-decoration: none; 
+	color: #2b6974; }
+
+form { text-align: center; }
+
+.button { background-color: #3b424c; 
+	color: #dcf3ee; 
+	padding: 3px 5px 3px 5px; 
+	margin: 10px 10px 10px 10px; 
+	border: none; 
+	border-top-style: solid; 
+	border-bottom-style: solid; 
+	border-color:#2b6974; 
+	border-width: 2px; }
+
+ul { padding: 10px; }
+
+li { padding: 3px 5px 3px 5px; 
+	margin: 10px 10px 10px 10px;
+	list-style: none; }

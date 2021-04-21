@@ -1,15 +1,23 @@
 <html>
-  	<head>
-    		<title>Login</title>
-  	</head>
+	<head>
+  	<title>Login</title>
+    <link rel="stylesheet" href="/styles/personal.css">
+    <link rel="stylesheet" href="/styles/swup.css">
+    <script src="https://unpkg.com/swup@latest/dist/swup.min.js"></script>  
+    <script defer src="/script.js"></script>
+	</head>
 	<body>
-  	<h1> Login </h1>
-		<p>please enter your personal details</p> 
-		<form method="POST" action="/loggedin">
-  			Username: <input id="usrName" type="text" name="usrName" /><br>
-  			Password: <input id="password" type="text" name="password" /><br>
-  			<input type="submit" value="OK" />
-		</form>
-		<a href='./'>Home</a>
-  	</body>
+    <header>
+      <h1><a id=title href='../'>HumbleStumble</a></h1>
+    </header>
+    <main id="swup" class="transition-fade">
+    	<h1> Login </h1>
+  		<p>please enter your account details</p> 
+  		<form method="POST" action="/loggedin">
+    			Username: <input id="usrName" type="text" name="usrName" /><br>
+    			Password: <input id="password" type="text" name="password" /><br>
+    			<input class="button" type="submit" value="OK" />
+  		</form>
+    </main>
+  </body>
 </html>

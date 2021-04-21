@@ -2,18 +2,50 @@
 <html>
   <head>
     <title>List  webpage!</title>
+    <% if(user.accType == "organisation") { %> 
+      <link rel="stylesheet" href="/styles/organisation.css">
+    <% } else {%> 
+      <link rel="stylesheet" href="/styles/personal.css">
+    <% } %> 
+    <link rel="stylesheet" href="/styles/swup.css">
+    <script src="https://unpkg.com/swup@latest/dist/swup.min.js"></script>  
+    <script defer src="/script.js"></script>
   </head>
 <body>
-  <ul>
-    <% listing.forEach(function(listing){ %>
-      <li> 
-        <a href="../display_listing?title=<%= listing.title %>"><%= listing.title %></a>
-        <%= listing.organisation %> 
-        <a href="/organisation/update_listing?title=<%= listing.title %>"> Update </a> 
-        <a href="/organisation/delete?title=<%= listing.title %>"> Delete </a> 
-      </li>
-    <% }) %>
-  </ul>
-  <a href='../'>Home</a>
+  <header>
+    <h1><a id=title href='../'>HumbleStumble</a></h1>
+    <% if(user.accType == "organisation") { %> 
+      <div id="menu">
+        <a href='/logout'>Logout</a>
+        <a href='/organisation/add_listing'>Add Listing</a>
+        <a href='/organisation/list'>Your Listings</a>
+      </div>
+    <% } else {%>
+      <div id="menu">
+        <a href='/logout'>Logout</a>
+        <a href='/personal/list'>Your Listings</a>
+      </div>
+    <% } %> 
+  </header>
+  <main id="swup" class="transition-fade">
+    <form action="/search_listing" method="POST">
+      <input id="search-box" type="text" name="keyword" value="Default">
+      <input class="button" type="submit" value="OK" >
+    </form>
+    <ul>
+      <% listing.forEach(function(listing){ %>
+        <li> 
+          <a href="../display_listing?id=<%= listing._id %>"><%= listing.title %></a>
+          <%= listing.organisation %> 
+          <% if(user.accType == "organisation") { %> 
+            <a href="/organisation/update_listing?id=<%= listing._id %>"> Update </a> 
+            <a href="/organisation/delete?id=<%= listing._id %>"> Delete </a> 
+          <% } else {%> 
+            <a href="/personal/accept_listing?id=<%= listing._id %>"> Accept </a>
+          <% } %> 
+        </li>
+      <% }) %>
+    </ul>
+  </main>
 </body>
 </html>

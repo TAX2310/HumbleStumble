@@ -30,7 +30,6 @@ module.exports = function(app){
 			if(await dbControle.login(req,accType)) {
 				req.session.userId = req.body.usrName;
 	      		req.session.accType = accType;
-	      		// res.render(accType + '/home.ejs');
 	      		res.redirect("/")
 			} else {
 	      		res.send("You have failed to login <br />"+'<a href='+'./'+'>Home</a>');

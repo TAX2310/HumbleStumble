@@ -2,22 +2,50 @@
 <html>
   <head>
     <title>Home page</title>
-    <link href='https://api.mapbox.com/mapbox-gl-js/v2.0.0/mapbox-gl.css' rel='stylesheet' />
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.0.0/mapbox-gl.css' rel='stylesheet'/>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.js"></script>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link rel="stylesheet" href="/styles/personal.css">
+    <link rel="stylesheet" href="/styles/swup.css">
+    <script src="https://unpkg.com/swup@latest/dist/swup.min.js"></script>  
+    <script defer src="/script.js"></script>
   </head>
-  <h1>HumbleStumble</h1>
+  
   <body>
-    <a href='/login'>Login</a>
-
-    <a href='/create_account'>Create account</a>
-
+    <header>
+      <h1><a id=title href='../'>HumbleStumble</a></h1>
+      <div id="menu">
+        <a href='/login'>Login</a>
+        <a href='/create_account'>Create account</a>
+      </div>  
+    </header>
+    <main id="swup" class="transition-fade">
+      <div id="map"></div>
+    </main>
     <script type="text/javascript">
-        mapboxgl.accessToken = 'pk.eyJ1IjoidGF5bG9yMjMxMCIsImEiOiJja2lnOHVtaHQwY3dmMnhtcW1yMHpoOWp5In0.s9Bj_7caOCem8NE1Yh7baw';
+      mapboxgl.accessToken = 
+        'pk.eyJ1IjoidGF5bG9yMjMxMCIsImEiOiJja2lnOHVtaHQwY3dmMnhtcW1yMHpoOWp5In0.s9Bj_7caOCem8NE1Yh7baw';
+      navigator.geolocation.getCurrentPosition(position => {
+        const { latitude, longitude } = position.coords;
+      
         var map = new mapboxgl.Map({
           container: 'map',
-          style: 'mapbox://styles/mapbox/streets-v11'
-        });</script>
-    <div id="map"></div>
-
-   
+          style: 'mapbox://styles/mapbox/streets-v11', // style URL
+          center: [longitude,latitude], // starting position [lng, lat]
+          zoom: 14 // starting zoom
+        });
+        map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+        map.addControl(
+          new mapboxgl.GeolocateControl({
+            positionOptions: {
+              enableHighAccuracy: true
+            }, trackUserLocation: true
+          })
+        );
+        <% listing.forEach(function(listing){ %>
+          new mapboxgl.Marker({color: "#2b6974"}).setLngLat([<%-JSON.stringify(listing.coords.longitude)%>, <%-JSON.stringify(listing.coords.latitude)%>]).setPopup(new mapboxgl.Popup().setHTML("<a href=display_listing?id=<%=listing._id%>><h1><%=listing.title%></h1></a> </br> <p>&quot<%=listing.description%>&quot</p>")).addTo(map);   
+        <% }) %>
+      });
+    </script>
   </body>
 </html>
