@@ -39,7 +39,6 @@ module.exports = function(app){
         req.session.accType = 'personal';
         res.redirect("/")
       }
-
     } 
   });
 
