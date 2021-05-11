@@ -23,12 +23,8 @@ module.exports = function(app){
     res.render('create_account/personal.ejs', {error: null});
   });
 
-  app.post('/create_account/personal_post',
-    [check('email').isEmail(),
-    check('usrName').isAlphanumeric().not().isEmpty(),
-    check('password').isLength({ min: 5, max:100 }),
-    check('bio').not().isEmpty()],
-    async function (req,res) {
+  app.post('/create_account/personal_post', [check('email').isEmail(), check('usrName').isAlphanumeric().not().isEmpty(), check('password').isLength({ min: 5, max:100 }), check('bio').not().isEmpty()],
+  async function (req,res) {
   
     const errors = validationResult(req);
 
