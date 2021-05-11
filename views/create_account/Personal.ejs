@@ -5,6 +5,11 @@
       <link rel="stylesheet" href="/styles/personal.css">
       <script src="https://unpkg.com/swup@latest/dist/swup.min.js"></script>  
       <script defer src="/script.js"></script>
+      <% if (error != null) { %>    
+        <script type="text/javascript">
+          window.alert(<%-JSON.stringify(error.errors[0].msg)%> + ' at ' + <%-JSON.stringify(error.errors[0].param)%>)
+        </script>
+      <% } %>
   	</head>
 	<body>
 		<header>
@@ -16,6 +21,7 @@
     			Username: <br><input id="usrName" type="text" name="usrName" ><br>
     		  Password: <br><input id="password" type="text" name="password" ><br>
           Email: <br><input id="email" type="text" name="email" ><br>
+          bio: <br> <textarea id="bio" name="bio"></textarea> <br>
     			<input class="button" type="submit" value="OK" />
   		</form>
     </main>

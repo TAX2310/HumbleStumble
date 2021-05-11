@@ -1,0 +1,102 @@
+
+<!doctype html>
+<html>
+  <head>
+    <title>list</title>
+    <% if(acc.accType == "organisation") { %> 
+      <link rel="stylesheet" href="/styles/organisation.css">
+    <% } else {%> 
+      <link rel="stylesheet" href="/styles/personal.css">
+    <% } %> 
+    <link rel="stylesheet" href="/styles/swup.css">
+    <script src="https://unpkg.com/swup@latest/dist/swup.min.js"></script>  
+    <script defer src="/script.js"></script>
+  </head>
+  <body>
+    <header>
+    <h1><a id=title href='../'>HumbleStumble</a></h1>
+    <% if(acc.accType == "organisation") { %> 
+      <div id="menu">
+        <a href='/organisation/add_listing'>Add Listing</a>
+        <a href='/organisation/list'>Your Listings</a>
+        <a href='/display_usr_acc'>Account</a>
+      </div>
+    <% } else {%>
+      <div id="menu">
+        <a href='/personal/list'>Your Listings</a>
+        <a href='/display_usr_acc'>Account</a>
+      </div>
+    <% } %>
+  </header>
+  <main id="swup" class="transition-fade">
+    <h1><%= acc.usrName %></h1><br>
+    <a href='/logout'>Logout</a><br>
+    <h3><%= acc.bio %></h3>
+    <% if(acc.accType == "personal") { %> 
+      <h3>Rank:<br>
+      <%= acc.rank %></h3>
+      <p>This is your rank. It is calculated every month from your completed jobs.<br>(Dont wory, only you can see this!)</p>
+    <% } %>
+
+    <% if(acc.accType == "organisation") { %> 
+      <ul>
+        <h3>Your finished listings</h3>
+        <p>Please give volenters a rating</p>
+        <% expired_listing.forEach(function(expired_listing){ %> 
+          <% if(expired_listing.volunteer != null) { %>
+            <li>
+              <h3><a href="/display_expired_listing?id=<%= expired_listing._id %>"><%= expired_listing.title %></a></h3><br>
+              Volunteer: <a href="/display_acc?usr=<%= expired_listing.volunteer %>"><%= expired_listing.volunteer %></a><br><br>
+              <% if(expired_listing.rating == null) { %> 
+                <form method="POST" action="/add_rating">
+                  <input id="rating" type="range" step="1" name="rating" min="1" max="5" value="1" oninput="this.nextElementSibling.value = this.value">
+                  <output >1</output>
+                  <input type="hidden" name="id" value="<%= expired_listing._id %>">
+                  <input type="submit" value="Submit Rating" >
+                </form>
+              <% } else { %>
+                Rating: <%= expired_listing.rating %>
+              <% } %>
+            </li>
+          <% } %>
+        </ul>
+      <% }) %>
+      <ul>
+        <h3>Your upcomiming listings with volunteers</h3>
+        
+        <% listing.forEach(function(listing){ %>
+          <% if(listing.volunteer != null) { %>
+            <li> 
+              <h3><a href="/display_listing?id=<%= listing._id %>"><%= listing.title %></a></h3><br>
+              <a href="/display_acc?usr=<%= listing.volunteer %>"><%= listing.volunteer %></a>
+            </li>
+          <% } %>
+        <% }) %>
+      </ul>
+    <% } else if(acc.accType == "personal") {%>
+      <br>
+      <h3>Overall Rating: <%= acc.avgRating %></h3>
+      <p>this is the average rating that charities have given you for work you have completed (only charities can view this) </p> <br>
+      <h3>Your finished listings</h3>
+      <% expired_listing.forEach(function(expired_listing){ %>
+        <li> 
+          <a href="../display_expired_listing?id=<%= expired_listing._id %>"><%= expired_listing.title %></a>
+            Rating: <%= expired_listing.rating %>
+        </li>
+      <% }) %>
+      <ul>
+        <h3>Your upcomiming listings</h3>
+        
+        <% listing.forEach(function(listing){ %>
+          <li> 
+            <a href="/display_listing?id=<%= listing._id %>"><%= listing.title %></a><br>
+            <a href="/display_acc?usr=<%= listing.volunteer %>"><%= listing.volunteer %></a>
+          </li>
+        <% }) %>
+      </ul>
+    <% } %>
+    </ul>
+    <br>
+  </main>
+  </body>
+</html>

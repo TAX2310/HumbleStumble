@@ -17,28 +17,32 @@
     <h1><a id=title href='../'>HumbleStumble</a></h1>
     <% if(user.accType == "organisation") { %> 
       <div id="menu">
-        <a href='/logout'>Logout</a>
         <a href='/organisation/add_listing'>Add Listing</a>
         <a href='/organisation/list'>Your Listings</a>
+        <a href='/display_usr_acc'>Account</a>
       </div>
     <% } else {%>
       <div id="menu">
-        <a href='/logout'>Logout</a>
         <a href='/personal/list'>Your Listings</a>
+        <a href='/display_usr_acc'>Account</a>
       </div>
     <% } %>
   </header>
   <main id="swup" class="transition-fade">
     <h1><%= listing.title %></h1><br>
     Charity:<br>
-    <h3><%= listing.user %></h3><br>
+    <h3><a href="/display_acc?usr=<%= listing.user %>"> <%= listing.user %> </a></h3><br>
     <p>Location: <br><%= listing.location %></p><br>
+    <p>Start Date and Time: <br><%= listing.expire %></p><br>
+    <p>Shift Length: <br><%= listing.shift %>h</p><br>
     <p>Description: <br><%= listing.description %></p><br>
     <% if (user.accType == 'organisation') {%>
       <a href="/organisation/update_listing?id=<%= listing._id %>"> Update </a> 
       <a href="/organisation/delete?id=<%= listing._id %>"> Delete </a>
     <% } else { %>
-      <a href="/personal/accept_listing?id=<%= listing._id %>"> Accept </a>
+      <% if (listing.status == "available") {%>
+        <a href="/personal/accept_listing?id=<%= listing._id %>"> Accept </a>
+      <% } %>
     <% } %>
     <br>
   </main>

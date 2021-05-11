@@ -33,10 +33,22 @@ a:hover { text-decoration: none;
 a:active { text-decoration: none; 
 	color: #ffe08a; }
 
-#title { top: 50%; border-style: none; }
+#intro { border-top-style:solid; 
+	border-bottom-style:solid; 
+	border-color:#e2712b;
+	width: 700px;
+	border-width: 2px;
+	display:inline-block;
+	padding-bottom: 20px;
+	background:#3b424c; }
+
+#title { top: 50%; 
+	border-style: none; }
 
 #menu { padding: 10px; 
-	z-index: 1; }
+	z-index: 1;
+	float:center;
+	text-align: center; }
 
 #map { position: absolute; 
 	top: 145px; 
@@ -58,6 +70,10 @@ a:active { text-decoration: none;
 #map a:active { text-decoration: none; 
 	color: #e2712b; }
 
+#map li a { }
+
+#map li {}
+
 form { text-align: center; }
 
 .button { background-color: #3b424c; 
@@ -72,6 +88,16 @@ form { text-align: center; }
 
 ul { padding: 10px; }
 
-li { padding: 3px 5px 3px 5px; 
-	margin: 10px 10px 10px 10px;
-	list-style: none; }
+li { padding: 10px; 
+	margin: 20px 10px 20px 10px;
+	width: 300px;
+	display:inline-block;
+	border-top-style:solid; 
+	border-bottom-style:solid; 
+	border-color:#e2712b;
+	list-style: none;
+	border-width: 2px; }
+
+li a { margin: 10px;
+	padding: 2px;
+}

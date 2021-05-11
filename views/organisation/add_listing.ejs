@@ -15,9 +15,9 @@
         <header>
             <h1><a id=title href='../'>HumbleStumble</a></h1>
             <div id="menu">
-            <a href='/logout'>Logout</a>
             <a href='/organisation/add_listing'>Add Listing</a>
             <a href='/organisation/list'>Your Listings</a>
+            <a href='/display_usr_acc'>Account</a>
             </div>
         </header>
         <main id="swup" class="transition-fade">
@@ -28,9 +28,11 @@
                     Location: <br> <input id="location" type="text" name="location" value="<%= listing.location %>"> <br>
                     Description: <br> <textarea id="description" name="description"><%= listing.description %></textarea> <br>
                     <br>Start date:<br>
-                    <input type="date" id="expire" name="expire"
+                    <input type="datetime-local" id="expire" name="expire"
                             value="<%= listing.expire %>"
                             min="2021-01-01" max="2100-12-31"> </br>
+                    Shift Length:<input id="shift" type="range" step="0.5" name="shift" min="1" max="12" value="1" oninput="this.nextElementSibling.value = this.value">
+                    <output >1</output><br>
                     <input type="submit" value="Submit" />
                 </form>
             <% } else { %>
@@ -39,9 +41,11 @@
                     Location: <br> <input id="location" type="text" name="location"> <br>
                     Description: <br> <textarea id="description" name="description"></textarea> <br>
                     <br>Start date:<br>
-                    <input type="date" id="expire" name="expire"
+                    <input type="datetime-local" id="expire" name="expire"
                            min="2021-01-01" max="2100-12-31"> </br>
-                    <input class="button" type="submit" value="Submit" />
+                    Shift Length:<input id="shift" type="range" step="0.5" name="shift" min="1" max="12" value="1" oninput="this.nextElementSibling.value = this.value">
+                    <output >1</output><br>
+                    <input type="submit" value="Submit" />
                 </form> 
             <% } %>
         </main>

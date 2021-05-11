@@ -1,12 +1,12 @@
 module.exports = function(app){  
 
-    const dbControle = require('./dbControle.js');
+    const dbControle = require('../dbControle.js');
     const { check, validationResult } = require('express-validator');
 
     const redirectLogin = (req, res, next) => {
 
-        if (!req.session.userId ) {
-            res.redirect('./login')
+        if (!req.session.userName ) {
+            res.redirect('../login')
         } else { 
             next (); 
         }
@@ -35,7 +35,7 @@ module.exports = function(app){
         res.render("organisation/add_listing.ejs", {listing: null, error: null, update: false});
     });
 
-    app.post('/organisation/listing_post', [check('title').isLength({ min: 5, max:100 }), check('location').not().isEmpty(), check('description').not().isEmpty()], 
+    app.post('/organisation/listing_post', [check('title').isAlphanumeric().isLength({ min: 5, max:100 }), check('location').not().isEmpty(), check('description').not().isEmpty()], 
     redirectLogin, redirectPersonal, async function (req,res) {
 
         console.log(req.body)
@@ -98,6 +98,14 @@ module.exports = function(app){
         res.render('display_listing.ejs', {listing: result, user: req.session});
     });
 
+    app.get('/display_expired_listing', redirectLogin, async function(req, res) {
+
+        console.log(req.query)
+        var result = await dbControle.findOneExpiredListing(req);
+        console.log(result)
+        res.render('display_listing.ejs', {listing: result, user: req.session});
+    });
+
     app.post('/search_listing', async function (req, res) {
 
         result = await dbControle.searchListing(req);
@@ -110,7 +118,12 @@ module.exports = function(app){
         dbControle.acceptListing(req);
         var result = await dbControle.findOneListing(req);
         res.send('you have accepted listing, title: '+ result.title + '<a href='+'../'+'>Home</a>');
+    });
 
+    app.post('/add_rating', function (req, res) {
+        console.log("add_rating")
+        dbControle.addRating(req.body.id, req.body.rating);
+        res.redirect('/display_usr_acc');
     });
 
 };

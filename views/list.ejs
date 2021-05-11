@@ -16,14 +16,14 @@
     <h1><a id=title href='../'>HumbleStumble</a></h1>
     <% if(user.accType == "organisation") { %> 
       <div id="menu">
-        <a href='/logout'>Logout</a>
         <a href='/organisation/add_listing'>Add Listing</a>
         <a href='/organisation/list'>Your Listings</a>
+        <a href='/display_usr_acc'>Account</a>
       </div>
     <% } else {%>
       <div id="menu">
-        <a href='/logout'>Logout</a>
         <a href='/personal/list'>Your Listings</a>
+        <a href='/display_usr_acc'>Account</a>
       </div>
     <% } %> 
   </header>
@@ -32,6 +32,7 @@
       <input id="search-box" type="text" name="keyword" value="Default">
       <input class="button" type="submit" value="OK" >
     </form>
+    <p>This is a list of all available opportunities</p>
     <ul>
       <% listing.forEach(function(listing){ %>
         <li> 

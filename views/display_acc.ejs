@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+  <head>
+    <title>list</title>
+    <% if(accType == "organisation") { %> 
+      <link rel="stylesheet" href="/styles/organisation.css">
+    <% } else {%> 
+      <link rel="stylesheet" href="/styles/personal.css">
+    <% } %> 
+    <link rel="stylesheet" href="/styles/swup.css">
+    <script src="https://unpkg.com/swup@latest/dist/swup.min.js"></script>  
+    <script defer src="/script.js"></script>
+  </head>
+  <body>
+    <header>
+    <h1><a id=title href='../'>HumbleStumble</a></h1>
+    <% if(accType == "organisation") { %> 
+      <div id="menu">
+        <a href='/organisation/add_listing'>Add Listing</a>
+        <a href='/organisation/list'>Your Listings</a>
+        <a href='/display_usr_acc'>Account</a>
+      </div>
+    <% } else {%>
+      <div id="menu">
+        <a href='/personal/list'>Your Listings</a>
+        <a href='/display_usr_acc'>Account</a>
+      </div>
+    <% } %>
+  </header>
+  <main id="swup" class="transition-fade">
+    <% if(acc.accType == "organisation") { %>
+      <h1><%= acc.usrName %></h1><br>
+      <h3><%= acc.bio %></h3>
+      <h2>previous listings</h2>
+      <ul>
+        <% expired_listing.forEach(function(expired_listing){ %>
+          <li>
+            <a href="../display_expired_listing?id=<%= expired_listing._id %>"><%= expired_listing.title %></a>
+          </li>
+        <% }) %>
+      </ul>
+    <% } else {%>
+      <h2><%= acc.usrName %></h2><br>
+      <h2>Overall Rating: <%= acc.avgRating %></h2><br>
+      <h2>previously volunteerd</h2>
+      <ul>
+        <% expired_listing.forEach(function(expired_listing){ %>
+          <li>
+            <a href="../display_expired_listing?id=<%= expired_listing._id %>"><%= expired_listing.title %></a>
+            Rating: <%= expired_listing.rating %>
+          </li>
+        <% }) %>
+      </ul>
+    <% } %>
+  </main>
+  </body>
+</html>

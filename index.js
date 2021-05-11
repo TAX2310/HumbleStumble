@@ -27,9 +27,9 @@ app.use(flash(app));
 
 //main.js link
 require('./routes/main')(app);
-require('./routes/create_account.js')(app);
-require('./routes/login.js')(app);
+require('./routes/account.js')(app);
 require('./routes/listing.js')(app);
+require('./Schedule.js')(app);
 
 app.set('views',__dirname + '/views');
 app.set('view engine', 'ejs');
