@@ -12,10 +12,18 @@ const fs = require('fs')
 const app = express()
 const port = 8443
 
+// HTTPS LOCALHOST
 https.createServer({
   key: fs.readFileSync('server.key'),
   cert: fs.readFileSync('server.cert')
 }, app)
+
+// HTTPS GLITCH
+// app.set('trust proxy', true); // <- required
+// app.use((req, res, next) => {
+//   if(!req.secure) return res.redirect('https://' + req.get('host') + req.url);
+//   next();
+// });
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(session({
@@ -42,10 +50,16 @@ app.set('views',__dirname + '/views');
 app.set('view engine', 'ejs');
 app.engine('html', require('ejs').renderFile);
 app.use(express.static(path.join(__dirname, "public")));
-// test
+
+// HTTPS LOCALHOST
 https.createServer({
   key: fs.readFileSync('server.key'),
   cert: fs.readFileSync('server.cert')
 }, app).listen(port, () => console.log(`app listening on port ${port}!`))
+
+// HTTPS GLITCH
+// var listener = app.listen(process.env.PORT, function () {
+//   console.log('Demo app listening on ' + listener.address().port);
+// });
 
 

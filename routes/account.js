@@ -68,7 +68,7 @@ module.exports = function(app){
   });
 
   app.get('/login', async function (req,res) {
-    res.render('login.ejs');
+    res.render('login.ejs', {error: null});
   });
 
   app.post('/loggedin', async function(req,res) {
@@ -77,19 +77,20 @@ module.exports = function(app){
         res.send("You are already logged in <br />"+'<a href=/'+'>Home</a>'); 
       return;
     }
-
+    var error;
     var accType = await dbControle.checkExistingAccType(req);
-    console.log(accType)
     if (accType != null) {
       if(await dbControle.login(req,accType)) {
         req.session.userName = req.body.usrName;
         req.session.accType = accType;
         res.redirect("/")
       } else {
-        res.send("You have failed to login <br />"+'<a href='+'./'+'>Home</a>');
+        error = 'the password you enterd is incorect'
+        res.render('login.ejs', {error: error})
       };
     } else {
-      res.send("No account with the user name " + req.body.usrName + " exists. <br />"+'<a href='+'./'+'>Home</a>');
+      error = 'the account you used does not exists'
+      res.render('login.ejs', {error: error})
     }
   });
 

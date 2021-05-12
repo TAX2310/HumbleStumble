@@ -123,7 +123,7 @@ async function checkExistingAccType(req) {
         resolve('organisation');
       }
       client.close();
-      reject(null);
+      resolve(null)
 	    });
 	});
 };
