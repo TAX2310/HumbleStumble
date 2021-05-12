@@ -352,36 +352,6 @@ async function findAllListings () {
 	});
 }
 
-// async function findAvailableUserListings (usr) {
-//   return new Promise((resolve, reject) => {
-//     MongoClient.connect(url, function (err, client) {
-//             if (err) throw err;
-//             var db = client.db('HS');
-//             db.collection('listing').find({status: 'available', user: usr}).toArray((err, results) => {
-//                 if (err) throw err;
-//                 client.close();
-//                 resolve(results);
-//             });
-//             client.close();
-//         });
-//   });
-// }
-
-// async function findExpiredUserListings () {
-//   return new Promise((resolve, reject) => {
-//     MongoClient.connect(url, function (err, client) {
-//             if (err) throw err;
-//             var db = client.db('HS');
-//             db.collection('listing').find({status: 'available', user: usr}).toArray((err, results) => {
-//                 if (err) throw err;
-//                 client.close();
-//                 resolve(results);
-//             });
-//             client.close();
-//         });
-//   });
-// }
-
 async function findAllAvailableListings () {
 	return new Promise((resolve, reject) => {
 		MongoClient.connect(url, function (err, client) {
@@ -435,7 +405,6 @@ async function moveExpiredListing() {
         var result = await findAllListings();
         let ts = Date.now();
         var date = new Date(ts);
-        // .toLocaleDateString()
         for (var i = 0; i < result.length; i++) {
         	if(date > result[i].expire){
         		db.collection('listing').remove({_id: new ObjectId(result[i]._id)});

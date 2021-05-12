@@ -1,4 +1,5 @@
 const express = require ('express')
+const https = require('https')
 const bodyParser = require ('body-parser')
 const session = require ('express-session')
 const validator = require ('express-validator');
@@ -6,9 +7,15 @@ const flash = require('express-flash-notification');
 const expressSanitizer = require('express-sanitizer');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const fs = require('fs')
 
 const app = express()
-const port = 8000
+const port = 8443
+
+https.createServer({
+  key: fs.readFileSync('server.key'),
+  cert: fs.readFileSync('server.cert')
+}, app)
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(session({
@@ -36,4 +43,9 @@ app.set('view engine', 'ejs');
 app.engine('html', require('ejs').renderFile);
 app.use(express.static(path.join(__dirname, "public")));
 // test
-app.listen(port, () => console.log(`app listening on port ${port}!`))
+https.createServer({
+  key: fs.readFileSync('server.key'),
+  cert: fs.readFileSync('server.cert')
+}, app).listen(port, () => console.log(`app listening on port ${port}!`))
+
+
