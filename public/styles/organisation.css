@@ -62,6 +62,8 @@ a:active { text-decoration: none;
 #map a:active { text-decoration: none; 
 	color: #2b6974; }
 
+#map p { color: #2b6974; }
+
 form { text-align: center; }
 
 .button { background-color: #3b424c; 

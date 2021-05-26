@@ -7,23 +7,27 @@ module.exports = function(app){
     const dbControle = require('../dbControle.js')
   const { check, validationResult } = require('express-validator');
 
-    const redirectLogin = (req, res, next) => {
-      if (!req.session.userName ) {
-          res.redirect('../login')
-      } else { 
-          next (); 
-      }
+  // method prevent acces to pages that require logged in status by redirecting to login page  
+  const redirectLogin = (req, res, next) => {
+    if (!req.session.userName ) {
+        res.redirect('../login')
+    } else { 
+      next (); 
     }
+  }
 
+  // GET routing method to render user selection page
   app.get('/create_account', function (req,res) {
     res.render('create_account/user_selection.ejs');
   });
 
+  // GET routing method to render personal create account page 
   app.get('/create_account/personal', function (req,res) {
     res.render('create_account/personal.ejs', {error: null});
   });
 
-  app.post('/create_account/personal_post', [check('email').isEmail(), check('usrName').isAlphanumeric().not().isEmpty(), check('password').isLength({ min: 5, max:100 }), check('bio').not().isEmpty()],
+  // POST routing method to validate form inputs, create personal account and update session data
+  app.post('/create_account/personal_post', [check('email').isEmail(), check('usrName').isAlphanumeric().not().isEmpty(), check('password').isLength({ min: 5, max:100 })],
   async function (req,res) {
   
     const errors = validationResult(req);
@@ -42,11 +46,13 @@ module.exports = function(app){
     } 
   });
 
+  // GET routing method to render organisation create account page
   app.get('/create_account/organisation', function (req,res) {
     res.render('create_account/organisation.ejs', {error: null});
   });
 
-  app.post('/create_account/organisation_post', [check('email').isEmail(), check('usrName').isAlphanumeric().not().isEmpty(), check('password').isLength({ min: 5, max:100 }), check('bio').not().isEmpty()],
+  // POST routing method to validate form inputs, create organisation account and update session data
+  app.post('/create_account/organisation_post', [check('email').isEmail(), check('usrName').isAlphanumeric().not().isEmpty(), check('password').isLength({ min: 5, max:100 })],
   async function (req,res) {
   
     const errors = validationResult(req);
@@ -67,10 +73,12 @@ module.exports = function(app){
     } 
   });
 
+  // GET routing method to render login page
   app.get('/login', async function (req,res) {
     res.render('login.ejs', {error: null});
   });
 
+  // POST routing method to loggin user if account with with username exists and password match
   app.post('/loggedin', async function(req,res) {
 
     if (req.session.userName != null) {
@@ -94,6 +102,7 @@ module.exports = function(app){
     }
   });
 
+  // GET routing method to logout user by destroying session data
   app.get('/logout', redirectLogin, (req,res) => {
     req.session.destroy(err => {
       if (err) res.send('sorry somthing whent wrong you did not log out. <a href='+'./'+'>Home</a>');
@@ -101,6 +110,7 @@ module.exports = function(app){
     });
   });
 
+  // GET routing method to find and display an account
   app.get('/display_acc', redirectLogin, async function (req,res) {
     if(req.query.usr == req.session.userName){
       res.redirect('/display_usr_acc')
@@ -115,6 +125,7 @@ module.exports = function(app){
     res.render('display_acc.ejs', { accType: req.session.accType, acc: accResult, expired_listing: expiredListings})
   });
 
+  // GET routing method to display the users account
   app.get('/display_usr_acc', redirectLogin, async function (req,res) {
     console.log(req.session.userName)
     var accResult = await dbControle.findOneAcc(req.session.userName);

@@ -12,10 +12,21 @@ const NodeGeocoder = require('node-geocoder');
   	const geocoder = NodeGeocoder(options);
 const schedule = require('node-schedule');
 
+// method to add a rating to an expired listing
+function addRating (id, rating) {
+  MongoClient.connect(url, async function (err, client) {
+    if (err) throw err;
+    var db = client.db('HS');
+    db.collection('expired_listing').updateOne({_id: new ObjectId(id)},{ $set: {
+      rating: rating
+    }});
+  });
+}
+
+// method to update the rank value of a personal user 
 function updateRank (rank, id) {
 	MongoClient.connect(url, async function(err, client) {
         if (err) throw err;
-        console.log('1')
         var db = client.db ('HS');
 	    db.collection('personal').updateOne({_id: new ObjectId(id)},{ $set: {
 	    	rank: rank
@@ -24,10 +35,10 @@ function updateRank (rank, id) {
     });
 };
 
+// method to reset the rank value of a personal user 
 function resetRank (rank, id) {
 	MongoClient.connect(url, async function(err, client) {
         if (err) throw err;
-        console.log('1')
         var db = client.db ('HS');
 	    db.collection('personal').updateOne({_id: new ObjectId(id)},{ $set: {
 	    	rank: null
@@ -38,6 +49,42 @@ function resetRank (rank, id) {
     });
 };
 
+// method to update a personal users average rating
+function updateAvgRating (id, avg) {
+  MongoClient.connect(url, async function(err, client) {
+    if (err) throw err;
+    var db = client.db ('HS');
+    db.collection('personal').updateOne({_id: new ObjectId(id)},{ $set: {
+      avgRating: avg.toFixed(1),
+    }});
+    client.close();
+    });
+};
+
+// acount methods
+
+// asynchronous method to create a new account bothe personal or organisation
+async function createAcc (req,type) {
+  return new Promise((resolve, reject) => {
+    MongoClient.connect(url, async function(err, client) {
+          if (err) throw err;
+          var db = client.db ('HS');
+          var plainPassword = req.sanitize(req.body.password);
+          var hashedPassword = await bcrypt.hash(plainPassword, saltRounds)
+          db.collection(type).insertOne({
+            usrName: req.sanitize(req.body.usrName),
+            password: hashedPassword,
+            email: req.sanitize(req.body.email),
+            bio: req.sanitize(req.body.bio),
+            accType: type
+          });
+          client.close();
+      });
+      resolve();
+    });
+};
+
+// asynchronous method to find and return all personal accounts
 async function findAllAcc () {
 	return new Promise((resolve, reject) => {
 		MongoClient.connect(url, function (err, client) {
@@ -53,6 +100,7 @@ async function findAllAcc () {
 	});
 }
 
+// asynchronous method to find and return an account document if it exists in personal and organisation collections else returns null
 async function findOneAcc (user) {
   return new Promise((resolve, reject) => {
     MongoClient.connect(url, async function(err, client) {
@@ -73,22 +121,7 @@ async function findOneAcc (user) {
   });
 }
 
-async function findApplyedListings (acc) {
-	return new Promise((resolve, reject) => {
-		MongoClient.connect(url, function (err, client) {
-            if (err) throw err;
-            var db = client.db('HS');
-            db.collection('expired_listing').find({volunteer: acc.usrName}).sort({expire: -1}).toArray((err, results) => {
-                if (err) throw err;
-                client.close();
-                // console.log(results);
-                resolve(results);
-            });
-            client.close();
-        });
-	});
-}
-
+// asynchronous method that returns true if an account document exists in the personal or organisation collections else returns false
 async function checkExistingAcc(req) {
 	return new Promise((resolve, reject) => {
 		MongoClient.connect(url, async function(err, client) {
@@ -107,6 +140,7 @@ async function checkExistingAcc(req) {
 	});
 };
 
+// asynchronous method that returns the account type if the account exists else returns null
 async function checkExistingAccType(req) {
 	return new Promise((resolve, reject) => {
 		MongoClient.connect(url, async function(err, client) {
@@ -128,6 +162,27 @@ async function checkExistingAccType(req) {
 	});
 };
 
+// asynchronous method fot logging in returns true if password match else false
+async function login (req, type) {
+  return new Promise((resolve, reject) => {
+    MongoClient.connect(url, async function(err, client) {
+          if (err) throw err;
+          var db = client.db ('HS');
+          var acc = await db.collection(type).findOne({usrName : req.body.usrName});
+          client.close();
+          var plainPassword = req.sanitize(req.body.password);
+      var hashedPassword = acc.password;
+      await bcrypt.compare(plainPassword, hashedPassword, function(err, result) {
+          resolve(result);        
+      });
+      });
+  }); 
+};
+
+
+// listing methods
+
+// asynchronous method to check if a listing with the same title exsists 
 async function checkExistingListing(req) {
 	return new Promise((resolve, reject) => {
 		MongoClient.connect(url, async function(err, client) {
@@ -145,8 +200,8 @@ async function checkExistingListing(req) {
 	});
 };
 
+// method to create a new listing 
 function createListing (req) {
-  console.log(req.body.shift)
 	MongoClient.connect(url, async function(err, client) {
         if (err) throw err;
         var coords = await geocoder.geocode(req.body.location)
@@ -166,20 +221,24 @@ function createListing (req) {
     });
 };
 
+// method to update an existing listing 
 function updateListing (req) {
 	MongoClient.connect(url, async function(err, client) {
         if (err) throw err;
-        console.log('1')
+        var coords = await geocoder.geocode(req.body.location)
         var db = client.db ('HS');
-	    db.collection('listing').updateOne({_id: new ObjectId(req.query.id)},{ $set: {
+	    db.collection('listing').updateOne({_id: new ObjectId(req.body.id)},{ $set: {
 	    	title: req.sanitize(req.body.title),
 	    	location: req.sanitize(req.body.location),
-			description: req.sanitize(req.body.description)
-		}});
+        coords: coords[0],
+			   description: req.sanitize(req.body.description),
+         expire: new Date(req.body.expire),
+		  }});
         client.close();
     });
 };
 
+// method to accept listing by changing status to unavalable and adding volunteer user name to listing 
 function acceptListing (req) {
 	MongoClient.connect(url, async function(err, client) {
       if (err) throw err;
@@ -192,65 +251,7 @@ function acceptListing (req) {
     });
 };
 
-function addRating (req) {
-  MongoClient.connect(url, async function(err, client) {
-    if (err) throw err;
-    var db = client.db ('HS');
-    db.collection('listing').updateOne({_id: new ObjectId(req.body.id)},{ $set: {
-      rating: parseInt(require.body.rating),
-    }});
-    client.close();
-    });
-};
-
-function updateAvgRating (id, avg) {
-  MongoClient.connect(url, async function(err, client) {
-    if (err) throw err;
-    var db = client.db ('HS');
-    db.collection('personal').updateOne({_id: new ObjectId(id)},{ $set: {
-      avgRating: avg.toFixed(1),
-    }});
-    client.close();
-    });
-};
-
-async function createAcc (req,type) {
-	return new Promise((resolve, reject) => {
-		MongoClient.connect(url, async function(err, client) {
-	        if (err) throw err;
-	        var db = client.db ('HS');
-	        var plainPassword = req.sanitize(req.body.password);
-	        var hashedPassword = await bcrypt.hash(plainPassword, saltRounds)
-	        db.collection(type).insertOne({
-    				usrName: req.sanitize(req.body.usrName),
-    				password: hashedPassword,
-    				email: req.sanitize(req.body.email),
-            bio: req.sanitize(req.body.bio),
-    				accType: type
-	        });
-	        client.close();
-	    });
-	    resolve();
-    });
-};
-
-async function login (req, type) {
-	return new Promise((resolve, reject) => {
-		MongoClient.connect(url, async function(err, client) {
-	        if (err) throw err;
-	        var db = client.db ('HS');
-	        var acc = await db.collection(type).findOne({usrName : req.body.usrName});
-	        client.close();
-	        var plainPassword = req.sanitize(req.body.password);
-			var hashedPassword = acc.password;
-			await bcrypt.compare(plainPassword, hashedPassword, function(err, result) {
-	    		resolve(result);	      
-			});
-	    });
-	});
-    
-};
-
+// asynchronous method to find and return a listing 
 async function findOneListing (req) {
 	return new Promise((resolve, reject) => {
 		MongoClient.connect(url, async function(err, client) {
@@ -264,6 +265,7 @@ async function findOneListing (req) {
 	});
 }
 
+// asynchronous method to find and return an expired listing 
 async function findOneExpiredListing (req) {
   return new Promise((resolve, reject) => {
     MongoClient.connect(url, async function(err, client) {
@@ -277,6 +279,7 @@ async function findOneExpiredListing (req) {
   });
 }
 
+// asynchronous method to find and return all listing created by a user
 async function findUserListings (req) {
 	return new Promise((resolve, reject) => {
 		MongoClient.connect(url, function (err, client) {
@@ -292,6 +295,7 @@ async function findUserListings (req) {
 	});
 }
 
+// asynchronous method to find and return all expired listing created by a user
 async function findUserExpiredListings (usr) {
   return new Promise((resolve, reject) => {
     MongoClient.connect(url, function (err, client) {
@@ -307,6 +311,7 @@ async function findUserExpiredListings (usr) {
   });
 }
 
+// asynchronous method to find and return all expired listings volunteered for by a user
 async function findVolunteerdExpiredListings (usr) {
   return new Promise((resolve, reject) => {
     MongoClient.connect(url, function (err, client) {
@@ -322,6 +327,7 @@ async function findVolunteerdExpiredListings (usr) {
   });
 }
 
+// asynchronous method to find and return all listings volunteered for by a user
 async function findVolunteerdListings (usr) {
   return new Promise((resolve, reject) => {
     MongoClient.connect(url, function (err, client) {
@@ -337,6 +343,7 @@ async function findVolunteerdListings (usr) {
   });
 }
 
+// asynchronous method to find and return all listings
 async function findAllListings () {
 	return new Promise((resolve, reject) => {
 		MongoClient.connect(url, function (err, client) {
@@ -352,6 +359,7 @@ async function findAllListings () {
 	});
 }
 
+// asynchronous method to find and return all listings where status is avalable 
 async function findAllAvailableListings () {
 	return new Promise((resolve, reject) => {
 		MongoClient.connect(url, function (err, client) {
@@ -367,6 +375,7 @@ async function findAllAvailableListings () {
 	});
 }
 
+// asynchronous method to delete a listing 
 async function deleteListing (req) {
 	return new Promise((resolve, reject) => {
 		MongoClient.connect(url, function (err, client) {
@@ -379,6 +388,7 @@ async function deleteListing (req) {
 	});
 }
 
+// asynchronous method to search listings
 async function searchListing (req) {
 	return new Promise((resolve, reject) => {
 		MongoClient.connect(url, async function (err, client) {
@@ -390,7 +400,6 @@ async function searchListing (req) {
         		{ title: 1, textScore: {$meta: "textScore"}}, 
 				{ sort: {textScore: {$meta: "textScore"}}
       		}).toArray(function(err, items) {
-      			console.log(items);
 	        	client.close();
 	        	resolve(items);
       		})
@@ -398,6 +407,7 @@ async function searchListing (req) {
 	});
 }
 
+// asynchronous method to move all listings that have expired to the expired_listing collections 
 async function moveExpiredListing() {
 	MongoClient.connect(url, async function (err, client) {
         if (err) throw err;
@@ -405,7 +415,8 @@ async function moveExpiredListing() {
         var result = await findAllListings();
         let ts = Date.now();
         var date = new Date(ts);
-        for (var i = 0; i < result.length; i++) {
+        var l = result.length;
+        for (var i = 0; i < l; i++) {
         	if(date > result[i].expire){
         		db.collection('listing').remove({_id: new ObjectId(result[i]._id)});
         		db.collection('expired_listing').insertOne(result[i]);
@@ -413,20 +424,25 @@ async function moveExpiredListing() {
               status: "unavailable",
               rating: null
             }});
-        		console.log("ok")
         	}
         }
 
     });
 }
 
-function addRating (id, rating) {
-  MongoClient.connect(url, async function (err, client) {
-    if (err) throw err;
-    var db = client.db('HS');
-    db.collection('expired_listing').updateOne({_id: new ObjectId(id)},{ $set: {
-      rating: rating
-    }});
+// asynchronous method to find and return all listings a user has applyed for that have expired 
+async function findApplyedListings (acc) {
+  return new Promise((resolve, reject) => {
+    MongoClient.connect(url, function (err, client) {
+            if (err) throw err;
+            var db = client.db('HS');
+            db.collection('expired_listing').find({volunteer: acc.usrName}).sort({expire: -1}).toArray((err, results) => {
+                if (err) throw err;
+                client.close();
+                resolve(results);
+            });
+            client.close();
+        });
   });
 }
 

@@ -70,9 +70,8 @@ a:active { text-decoration: none;
 #map a:active { text-decoration: none; 
 	color: #e2712b; }
 
-#map li a { }
+#map p { color: #e2712b; }
 
-#map li {}
 
 form { text-align: center; }
 

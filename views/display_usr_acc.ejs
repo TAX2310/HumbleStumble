@@ -89,8 +89,7 @@
         
         <% listing.forEach(function(listing){ %>
           <li> 
-            <a href="/display_listing?id=<%= listing._id %>"><%= listing.title %></a><br>
-            <a href="/display_acc?usr=<%= listing.volunteer %>"><%= listing.volunteer %></a>
+            <a href="/display_listing?id=<%= listing._id %>"><%= listing.title %></a>
           </li>
         <% }) %>
       </ul>

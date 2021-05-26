@@ -24,8 +24,9 @@
         <h2> Add Listing </h2>
             <% if (update) { %>
                 <form method="POST" action="/organisation/listing_update_post">
+                    <input id="id" type="hidden" name="id" value="<%= listing._id %>">
                     Title: <br> <input id="title" type="text" name="title" value="<%= listing.title %>"> <br>
-                    Location: <br> <input id="location" type="text" name="location" value="<%= listing.location %>"> <br>
+                    Location (Post Code): <br> <input id="location" type="text" name="location" value="<%= listing.location %>"> <br>
                     Description: <br> <textarea id="description" name="description"><%= listing.description %></textarea> <br>
                     <br>Start date:<br>
                     <input type="datetime-local" id="expire" name="expire"

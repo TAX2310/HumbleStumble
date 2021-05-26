@@ -4,27 +4,28 @@ module.exports = function(app){
 
   var sch;
 
-  schedule.scheduleJob('0 0 0 * * *', function(){
+  // schedual method that calculates last day of current month 
+  schedule.scheduleJob('0 * * * * *', function(){
   	var dt = new Date();
   	var month = dt.getMonth();
   	var year = dt.getFullYear();
   	var daysInMonth = new Date(year, month, 0).getDate();
   	sch = "0 59 23 " + daysInMonth + " * *"
-  	console.log(sch)
   });
 
-  schedule.scheduleJob('0 0 0 * * *', function(){
-    console.log("move expired")
+  // schedual method that moves expired listings every miniute
+  schedule.scheduleJob('0 * * * * *', function(){
   	dbControle.moveExpiredListing();
   });
 
-  schedule.scheduleJob('0 0 0 * * *', async function(){
+  // schedual method that calculates and updates every users average rating and rank every miniute
+  schedule.scheduleJob('0 * * * * *', async function(){
     
     var allAcc = await dbControle.findAllAcc();
   	for (var i = 0; i < allAcc.length; i++) {
       var count = 0;
       var total = 0;
-  		var listings = await dbControle.findVolunteerdExpiredListings(allAcc[i]);
+  		var listings = await dbControle.findVolunteerdExpiredListings(allAcc[i].usrName);
   		for (var j = 0; j < listings.length; j++) {
   			if(listings[j].rating != null){
           total += listings[j].rating;
@@ -33,6 +34,7 @@ module.exports = function(app){
   		};
   		
   		var avg = total/count;
+      console.log(avg)
 
       dbControle.updateAvgRating(allAcc[i]._id, avg)	
 
@@ -51,8 +53,8 @@ module.exports = function(app){
   	};
   });
 
+  // schedual method that resets all users rank on the last day of every month
   schedule.scheduleJob(sch, async function(){
-    console.log("reset rank")
     var allAcc = await dbControle.findAllAcc();
     for (var i = 0; i < allAcc.length; i++) {
     	dbControle.resetRank(allAcc[i].rank, allAcc[i]._id);
